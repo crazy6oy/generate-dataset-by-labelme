@@ -56,23 +56,23 @@ def statistic_semantic_num(json_dir, connector="_", shape_type="polygon"):
 
 
 def statistic_region_num(json_dir, shape_type="polygon"):
-    json_files_name = [x for x in os.listdir(
-        json_dir) if x.split(".")[-1] == "json"]
-
     outputs = {}
-    for json_name in tqdm.tqdm(json_files_name):
-        json_path = os.path.join(json_dir, json_name)
-
-        with open(json_path, encoding="utf-8") as f:
-            json_msg = json.load(f)
-
-        for msg in json_msg["shapes"]:
-            if msg["shape_type"] != shape_type:
+    for root, dirs, names in os.walk(json_dir):
+        for name in tqdm.tqdm(names, desc=os.path.split(root)[-1]):
+            if name.split(".")[-1] != "json":
                 continue
+            json_path = os.path.join(root, name)
 
-            if msg["label"] not in outputs.keys():
-                outputs[msg["label"]] = 0
-            outputs[msg["label"]] += 1
+            with open(json_path, encoding="utf-8") as f:
+                json_msg = json.load(f)
+
+            for msg in json_msg["shapes"]:
+                if msg["shape_type"] != shape_type:
+                    continue
+
+                if msg["label"] not in outputs.keys():
+                    outputs[msg["label"]] = 0
+                outputs[msg["label"]] += 1
 
     print(outputs)
 
@@ -209,15 +209,15 @@ if __name__ == '__main__':
     ]
 
     json_dir = r"D:\work\dataSet\organ-segmentation\v1\origin_json\v3"
-    save_dir = r"D:\work\dataSet\organ-segmentation\v1\processed_json\v3"
+    save_dir = r"Z:\withai\dataset\origin-data\lc-instruments-segmentation\20-categories"
     divide_log = r"D:\work\dataSet\organ-segmentation\v3\divide_log.json"
 
     # 清洗标签
     # fix_labels(json_dir, save_dir, fix_map, continue_labels)
-    # statistic_region_num(save_dir)
+    statistic_region_num(save_dir)
 
     # 统计各数据集中各类别出现次数
     # statistic_appear_num_in_every_dataset(json_dir,divide_log)
 
     # 生成json中的图片
-    draw_all_json(json_dir)
+    # draw_all_json(json_dir)
